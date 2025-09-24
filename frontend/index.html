@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Brain Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">IoT Brain Dashboard</div>
+        <div class="nav-links">
+            <button class="nav-btn active" data-page="sensors">Sensors</button>
+            <button class="nav-btn" data-page="devices">Devices</button>
+            <button class="nav-btn" data-page="history">Sensor History</button>
+            <button class="nav-btn" data-page="alarms">Alarms</button>
+        </div>
+        <div class="connection-status" id="connectionStatus">Connecting...</div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Page 1: Sensors -->
+        <div id="sensors-page" class="page active">
+            <div class="page-header">
+                <h1>Sensor Overview</h1>
+                <div class="status-legend">
+                    <span class="legend-item"><span class="status-dot status-good"></span>Normal</span>
+                    <span class="legend-item"><span class="status-dot status-warning"></span>Warning</span>
+                    <span class="legend-item"><span class="status-dot status-critical"></span>Critical</span>
+                </div>
+            </div>
+            <div id="sensor-grid" class="sensor-grid">
+                <!-- Sensor boxes will be dynamically generated -->
+            </div>
+            <div class="mqtt-section">
+                <h2>MQTT Topics</h2>
+                <div class="mqtt-table-container">
+                    <table id="mqtt-table" class="mqtt-table">
+                        <thead>
+                            <tr>
+                                <th>Topic</th>
+                                <th>Latest Message</th>
+                                <th>Last Updated</th>
+                                <th>Delta Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- MQTT data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 2: Devices -->
+        <div id="devices-page" class="page">
+            <div class="page-header">
+                <h1>Device Management</h1>
+            </div>
+            <div id="device-list" class="device-list">
+                <!-- Device cards will be dynamically generated -->
+            </div>
+        </div>
+
+        <!-- Page 3: Sensor History -->
+        <div id="history-page" class="page">
+            <div class="page-header">
+                <h1>Sensor History</h1>
+                <div class="time-controls">
+                    <label for="timeRange">Time Range:</label>
+                    <select id="timeRange">
+                        <option value="1h">Last Hour</option>
+                        <option value="6h">Last 6 Hours</option>
+                        <option value="24h" selected>Last 24 Hours</option>
+                        <option value="7d">Last 7 Days</option>
+                    </select>
+                </div>
+            </div>
+            <div id="charts-container" class="charts-container">
+                <!-- Charts will be dynamically generated -->
+            </div>
+        </div>
+
+        <!-- Page 4: Alarms -->
+        <div id="alarms-page" class="page">
+            <div class="page-header">
+                <h1>Alarm History & Statistics</h1>
+            </div>
+            <div class="alarm-stats">
+                <div class="stat-card">
+                    <h3>Total Alarms</h3>
+                    <div class="stat-value" id="totalAlarms">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Warnings</h3>
+                    <div class="stat-value warning" id="warningAlarms">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Critical</h3>
+                    <div class="stat-value critical" id="criticalAlarms">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Last 24h</h3>
+                    <div class="stat-value" id="recentAlarms">0</div>
+                </div>
+            </div>
+            <div class="alarm-history">
+                <h2>Alarm History</h2>
+                <div class="alarm-table-container">
+                    <table id="alarm-table" class="alarm-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Device</th>
+                                <th>Type</th>
+                                <th>Value</th>
+                                <th>Threshold</th>
+                                <th>Severity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Alarm history will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Threshold Edit Modal -->
+    <div id="threshold-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Thresholds</h2>
+            <form id="threshold-form">
+                <div class="form-group">
+                    <label for="device-name">Device:</label>
+                    <input type="text" id="device-name" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="warning-threshold">Warning Threshold:</label>
+                    <input type="number" id="warning-threshold" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="critical-threshold">Critical Threshold:</label>
+                    <input type="number" id="critical-threshold" step="0.01" required>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" id="cancel-btn">Cancel</button>
+                    <button type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Device Details Modal -->
+    <div id="device-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Device Details</h2>
+            <div id="device-details">
+                <!-- Device details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/websocket.js"></script>
+    <script src="js/sensors.js"></script>
+    <script src="js/devices.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/alarms.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
