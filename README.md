@@ -64,9 +64,6 @@ The system will automatically:
 cd examples
 python3 mqtt_test_sender.py
 
-# Or use the interactive mode
-python3 mqtt_test_sender.py --interactive
-
 # Or use the shell script
 ./run_test_sender.sh
 ```
@@ -569,19 +566,6 @@ cd examples
 python3 mqtt_test_sender.py
 # Runs: device registration → sensor data → continuous stream → cleanup
 ```
-
-**Interactive Testing**:
-```bash
-python3 mqtt_test_sender.py --interactive
-# Provides menu-driven testing interface
-```
-
-**Threshold Breach Testing**:
-```bash
-# In interactive mode, select option 7
-# Generates warning and critical level sensor data
-```
-
 #### Manual MQTT Testing:
 
 **Device Registration**:
